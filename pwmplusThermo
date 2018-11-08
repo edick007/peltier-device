@@ -1,0 +1,91 @@
+/*
+ * Code For controlling a pwm utilizing the analog write function 
+ * Purpose:
+ *  create a meaurable range of tempuratures with a thermocouple
+ *  dev: Ed
+ *  
+ *  Components:
+ *  Board: Nano
+ *  Peltier:
+ *  Thermometer
+ *  
+*/
+//THERMO
+
+
+#include <SPI.h>
+#include "Adafruit_MAX31855.h"
+
+// Default connection is using software SPI, but comment and uncomment one of
+// the two examples below to switch between software SPI and hardware SPI:
+
+// Example creating a thermocouple instance with software SPI on any three
+// digital IO pins.
+#define MAXDO   3
+#define MAXCS   4
+#define MAXCLK  5
+
+
+
+// initialize the Thermocouple
+Adafruit_MAX31855 thermocouple(MAXCLK, MAXCS, MAXDO);
+
+// Example creating a thermocouple instance with hardware SPI
+// on a given CS pin.
+//#define MAXCS   10
+//Adafruit_MAX31855 thermocouple(MAXCS);
+
+
+// These constants won't change. They're used to give names to the pins used:
+const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
+const int analogOutPin = 9; // Analog output pin that the LED is attached to
+
+int sensorValue = 0;  // value read from the pot
+char max = 10;
+double outputValue[10] = { 2.5};        // value output to the PWM (analog out)
+
+void setup() {
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600);
+
+  
+  while (!Serial) delay(1); // wait for Serial on Leonardo/Zero, etc
+
+  Serial.println("MAX31855 test");
+  // wait for MAX chip to stabilize
+  delay(500);
+}
+double actualinput(double data){
+  double actual;
+    actual = data/5*255;
+    return actual;
+}
+
+void loop() {
+   Serial.print("\n Input Voltages and Readings from Peltier: ");
+  for(char i = 0; i < max;  i++){
+    double data = actualinput(outputValue[i]); //pwm high to the peltier
+    analogWrite(analogOutPin, data);
+    Serial.print("Internal Temp = ");
+   Serial.println(thermocouple.readInternal());
+
+   double c = thermocouple.readCelsius();
+   if (isnan(c)) {
+     Serial.println("Something wrong with thermocouple!");
+   } else {
+     Serial.print("C = "); 
+     Serial.println(c);
+   }
+   //Serial.print("F = ");
+   //Serial.println(thermocouple.readFarenheit());
+ 
+   delay(2);
+  }
+ 
+
+
+
+  // wait 2 milliseconds before the next loop for the analog-to-digital
+  // converter to settle after the last reading:
+  delay(2);
+}
