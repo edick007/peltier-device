@@ -1,3 +1,10 @@
+// 
+//	Default example of using two thermocouples to measure tempurature
+//
+//
+//
+
+
 #include <Adafruit_MAX31855.h>
 #include <SPI.h>
 int maxDO =  5;
