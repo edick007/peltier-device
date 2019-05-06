@@ -14,6 +14,8 @@
 #define maxV 255
 #define minV 0
 
+#define hot_target  85    // target tempuratures set before running
+#define cold_target 50
 #include <Adafruit_MAX31855.h>
 int maxDO = 5;
 int maxCS = 6;
@@ -30,16 +32,9 @@ Adafruit_MAX31855 thermoTwo(maxCLK2, maxCS2, maxDO2);
 int count = 0;
 float arduinoV;
 
-
-void setup() {
-	Serial.begin(9600);
-	// The MAX31855 needs a little time to stabilize
-	delay(500);
-}
-
 //	curr_diff_hot 
 //		calculates and returns the difference from the target tempurature and the current for hot side
-double cur_diff_hot(double hot_target) {
+double cur_diff_hot() {
 	double hot_current;
 	hot_current = thermoTwo.readCelsius();
 
@@ -49,50 +44,68 @@ double cur_diff_hot(double hot_target) {
 //	curr_diff_cold
 //		calculates and returns the difference from the target tempurature and the current for cold side
 
-double cur_diff_cold(double cold_target) {
+double cur_diff_cold() {
 	double cold_current;
 	cold_current = thermoTwo.readCelsius();
 
 	return (cold_target - cold_current);
 }
 
+//	get_to_target
+//		makes peliters get to specified tempuratures
 void get_to_target(double cold, double hot) {
-	while (cur_diff_hot() > 10) {
+	while (cur_diff_hot() > 5) {
 		analogWrite(10, maxV) //write to the second Mosfet 255
+		if (cur_diff_cold() > 5) {
+			analogWrite(9, maxV) //write to the second Mosfet 255
+		}
 	}
-	while (cur_diff_hot() > 2) {
+	
+	while (cur_diff_hot() > 1) {
 		analogWrite(10, maxV / 2); //slow down temp increase
+		if (cur_diff_cold() > 1) {
+			analogWrite(9, maxV) //write to the second Mosfet 255
+		}
 	}
 	return 0;
 }
-void loop() {
-	double tar_cold;
-	double tar_hot;
 
-	delay(2000);
-	Serial.println("Start Test \n");
+void setup() {
+	Serial.begin(9600);
+	// The MAX31855 needs a little time to stabilize
+	delay(500);
 
-	Serial.println("Input target cold tempurature in C: ");
+	Serial.print("Input target Cold tempurature in C: ");
+	Serial.println(cold_target);
 	//serial in tar_cold
-	Serial.prinln("Input target Hot tempurature in C:");
+	Serial.print("Input target Hot tempurature in C:");
+	Serial.println(hot_target);
 	//serial in tar_hot
+	delay(1000);
 
-	for (unsigned char V = 0; V < 256; V++) {  //loop that sets Arduino voltage on scale from 0 to 5 V and changes mossfet
-		//analogWrite(9, V);     //write the voltage to the first mosfet
-		analogWrite(10, V);  //write to the second Mosfet
+	get_to_target();   //start getting to target tempurature
 
-		Serial.print(thermoOne.readCelsius()); //cold
-		Serial.print(", ");
-		Serial.print(thermoTwo.readCelsius()); //hot
-		Serial.print(", ");
+	Serial.print(thermoOne.readCelsius()); //cold
+	Serial.print(", ");
+	Serial.print(thermoTwo.readCelsius()); //hot
+	Serial.print("\n");
 
-		Serial.print(V);
-		Serial.println();
-		count++;
+	Serial.println("Start Test \n");
+}
 
-		delay(5000);           //delay  5 sec 
+
+void loop() {
+
+	//need to set up tempurature ranges and appropriate voltages to maintain the targets
+	if(cur_diff_cold > .5){
+		analogWrite(9, maxV);
 	}
+	if (cur_diff_hot > .5) {
+		analogWrite(10, maxV);
+	}
+	// do the same for over shooting
 
+	
 
 	// delay so it doesn't scroll too fast.
 	delay(1000);
