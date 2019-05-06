@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\LCDandTHERMO",
+    "\\Peliter Tests",
+    "\\Pwm",
+    "\\Thermocouple"
+  ],
+  "SelectedNode": "\\Peliter Tests\\dynamic_target_temp.ino",
+  "PreviewInSolutionExplorer": false
+}
