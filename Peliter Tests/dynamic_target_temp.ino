@@ -14,8 +14,9 @@
 #define maxV 255
 #define minV 0
 
-#define hot_target  85    // target tempuratures set before running
+#define hot_target  75    // target tempuratures set before running
 #define cold_target 50
+
 #include <Adafruit_MAX31855.h>
 int maxDO = 5;
 int maxCS = 6;
@@ -36,7 +37,7 @@ float arduinoV;
 //		calculates and returns the difference from the target tempurature and the current for hot side
 double cur_diff_hot() {
 	double hot_current;
-	hot_current = thermoTwo.readCelsius();
+	hot_current = thermoOne.readCelsius();
 
 	return (hot_target - hot_current);
 }
@@ -54,20 +55,54 @@ double cur_diff_cold() {
 //	get_to_target
 //		makes peliters get to specified tempuratures
 void get_to_target() {
+	int count = 0;
 	while (cur_diff_hot() > 5) {
-		analogWrite(10, maxV) //write to the second Mosfet 255
+
+		analogWrite(10, maxV); //write to the second Mosfet 255
 		if (cur_diff_cold() > 5) {
-			analogWrite(9, maxV) //write to the second Mosfet 255
+			analogWrite(9, maxV); //write to the second Mosfet 255
 		}
-	}
-	
-	while (cur_diff_hot() > 1) {
-		analogWrite(10, maxV / 2); //slow down temp increase
-		if (cur_diff_cold() > 1) {
-			analogWrite(9, maxV) //write to the second Mosfet 255
+		if (cur_diff_cold() <= 0) {
+			analogWrite(9, minV);
 		}
+		//if (count > 1000) {
+		Serial.print(thermoOne.readCelsius()); //cold
+		Serial.print("C, ");
+		Serial.print(thermoTwo.readCelsius()); //hot
+		Serial.print(" C, cur_diff_hot: ");
+		Serial.print(cur_diff_hot());
+		Serial.print(", cur_diff_cold: ");
+		Serial.print(cur_diff_cold());
+		Serial.print("\n");
+
+		//}
 	}
-	return 0;
+
+	while (cur_diff_hot() > 0) {
+
+		analogWrite(10, maxV * .8); //slow down temp increase
+		if (cur_diff_cold() > 0) {
+			analogWrite(9, maxV); //write to the second Mosfet 255
+		}
+		if (cur_diff_cold() <= 0) {
+			analogWrite(9, minV);
+		}
+		//if (count > 1000) {
+		Serial.print(thermoOne.readCelsius()); //cold
+		Serial.print(" C, ");
+		Serial.print(thermoTwo.readCelsius()); //hot
+		Serial.print(" C, cur_diff_hot: ");
+		Serial.print(cur_diff_hot());
+		Serial.print(", cur_diff_cold: ");
+		Serial.print(cur_diff_cold());
+		Serial.print("\n");
+
+		if (cur_diff_hot() <= 0) {
+			return;
+		}
+
+		//}
+	}
 }
 
 void setup() {
@@ -83,6 +118,11 @@ void setup() {
 	//serial in tar_hot
 	delay(1000);
 
+	Serial.print(thermoOne.readCelsius()); //cold
+	Serial.print(", ");
+	Serial.print(thermoTwo.readCelsius()); //hot
+	Serial.print("\n");
+
 	get_to_target();   //start getting to target tempurature
 
 	Serial.print(thermoOne.readCelsius()); //cold
@@ -95,32 +135,31 @@ void setup() {
 
 
 void loop() {
-	
 	//need to set up tempurature ranges and appropriate voltages to maintain the targets
-	if(cur_diff_cold > .5){
+	if (cur_diff_cold() > 0) {
 		analogWrite(9, maxV);
 	}
-	else if(cur_diff_cold < -0.5){
+	else if (cur_diff_cold() <= 0) {
 		analogWrite(9, minV);
 	}
-	if (cur_diff_hot > .5) {
+	if (cur_diff_hot() > 0) {
 		analogWrite(10, maxV);
 	}
-	else if(cur_diff_cold < -0.5){
+	else if (cur_diff_cold() < 0) {
 		analogWrite(10, minV);
 	}
 	// do the same for over shooting
-	count++;
-	if(count > 400){
-		Serial.print(thermoOne.readCelsius()); //cold
-		Serial.print(", ");
-		Serial.print(thermoTwo.readCelsius()); //hot
-		Serial.print("\n");
-		count = 0;
-	}
+	//count++;
+	//if (count > 400) {
+	Serial.print(thermoOne.readCelsius()); //cold
+	Serial.print(", ");
+	Serial.print(thermoTwo.readCelsius()); //hot
+	Serial.print("\n");
+	count = 0;
+	//}
 
-	
+
 
 	// delay so it doesn't scroll too fast.
-	delay(10);
+	//delay(10);
 }
