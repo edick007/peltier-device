@@ -80,7 +80,7 @@ void get_to_target() {
 
 	while (cur_diff_hot() > 0) {
 
-		analogWrite(10, maxV * .8); //slow down temp increase
+		analogWrite(10, maxV); //slow down temp increase
 		if (cur_diff_cold() > 0) {
 			analogWrite(9, maxV); //write to the second Mosfet 255
 		}
