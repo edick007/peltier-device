@@ -3,9 +3,10 @@
     "",
     "\\LCDandTHERMO",
     "\\Peliter Tests",
+    "\\Peliter Tests\\dynamic_target_temp",
     "\\Pwm",
     "\\Thermocouple"
   ],
-  "SelectedNode": "\\Peliter Tests\\dynamic_target_temp.ino",
+  "SelectedNode": "\\LCDandTHERMO\\lcdthermocouple.ino",
   "PreviewInSolutionExplorer": false
 }

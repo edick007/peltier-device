@@ -191,10 +191,10 @@ void setup() {
 	// The MAX31855 needs a little time to stabilize
 
 	delay(500);
-	//hot_target = 25;
-	//cold_target = 25;
+	hot_target = 30;
+	cold_target = 30;
 
-	//get_to_target(hot_target, cold_target);
+	get_to_target(hot_target, cold_target);
 
 
 	Serial.println("Start Test 1");
@@ -207,7 +207,7 @@ void loop() {
 
 	//test for hot inc and cool down
 
-	/*while (test == 1) {
+	while (test == 1) {
 
 	if (flag == 0) {
 		analogWrite(10, maxV);  //write to the second Mosfet hot
@@ -228,7 +228,7 @@ void loop() {
 		Serial.println("Cool Down");
 	}
 
-	if ((thermoOne.readCelsius() <= 25) && (flag == 1)) {
+	if ((thermoOne.readCelsius() <= 30) && (flag == 1)) {
 		Serial.println(" END TEST 1");
 		test = 2;
 		Serial.println(" Start TEST 2");
@@ -260,7 +260,7 @@ void loop() {
 			Serial.println("Cool Down");
 		}
 
-		if ((thermoOne.readCelsius() < 25) && (flag == 1)) {
+		if ((thermoOne.readCelsius() < 30) && (flag == 1)) {
 			Serial.println(" END TEST 2");
 			test = 3;
 
@@ -269,7 +269,7 @@ void loop() {
 
 
 	}
-	*/
+	
 
 
 	unsigned char hot = 50;
