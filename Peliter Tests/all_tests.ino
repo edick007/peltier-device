@@ -11,9 +11,9 @@
 int maxDO = 5;
 int maxCS = 6;
 int maxCLK = 7;
-int maxDO2 = 2;
-int maxCS2 = 3;
-int maxCLK2 = 4;
+int maxDO2 = 11;
+int maxCS2 = 12;
+int maxCLK2 = 13;
 
 char hot_target = 25;   // target tempuratures set before running
 char cold_target = 25;
@@ -47,42 +47,119 @@ double cur_diff_cold(double cold) {
 	return (cold - cold_current);
 }
 
+//	function get_max
+//	returns an appropriate voltage to get smoother tempurature consistancy
+double get_maxV(double temp, double type) {
+	if ((temp >= 20) && (temp < 25)) {
+		return 25;
+	}
+	else if ((temp >= 25) && (temp < 30)) {
+		return 77;
+	}
+	else if ((temp >= 30) && (temp < 35)) {
+		return 50;
+	}
+	else if ((temp >= 35) && (temp < 40)) {
+		if ((type == 1) && (thermoOne.readCelsius() < 30)) {		//if its hot type and not close to target go max voltage 255
+			return 255;
+		}
+		else if ((type == 2) && (thermoTwo.readCelsius() < 30)) {
+			return 255;
+		}
+		else { return 128; }
+	}
+	else if ((temp >= 40) && (temp < 45)) {
+		if ((type == 1) && (thermoOne.readCelsius() < 36)) {		//if its hot type and not close to target go max voltage 255
+			return 255;
+		}
+		else if ((type == 2) && (thermoTwo.readCelsius() < 36)) {
+			return 255;
+		}
+		else { return 143; }
+	}
+	else if ((temp >= 45) && (temp < 50)) {
+		if ((type == 1) && (thermoOne.readCelsius() < 42)) {		//if its hot type and not close to target go max voltage 255
+			return 255;
+		}
+		else if ((type == 2) && (thermoTwo.readCelsius() < 42)) {
+			return 255;
+		}
+		else { return 153; }
+	}
+	else if ((temp >= 50) && (temp <= 60)) {
+		if ((type == 1) && (thermoOne.readCelsius() < 48)) {		//if its hot type and not close to target go max voltage 255
+			return 255;
+		}
+		else if ((type == 2) && (thermoTwo.readCelsius() < 48)) {
+			return 255;
+		}
+		else { return 191; }
+	}
+	else {
+		return 255;
+	}
+}
+
 //	get_to_target
 //	makes peliters get to specified tempuratures
 void get_to_target(double hot, double cold) {
-
-
+	//Serial.println("before while");
+	unsigned char hot_maxV = 0;
+	unsigned char cold_maxV = 0;
 	while ((cur_diff_hot(hot) > 0) || (cur_diff_cold(cold) > 0)) {
+		//Serial.println("starting while");
 		if (cur_diff_hot(hot) > 0) {
+			hot_maxV = get_maxV(hot, 1);
 			analogWrite(10, maxV);
+			//Serial.println("HOT if not hot");
 		}
 		else if (cur_diff_hot(hot) <= 0) {
-			analogWrite(minV);
+			analogWrite(10, minV);
+			//Serial.println("HOT if too hot");
 		}
 		if (cur_diff_cold(cold) > 0) {
-			analogWrite(9, maxV);
+			cold_maxV = get_maxV(hot, 1);
+			analogWrite(9, 5);
+			//Serial.println("Cold if not hot");
+
 		}
 		else if (cur_diff_cold(hot) <= 0) {
-			analogWrite(9, minV);
+			//analogWrite(9, minV);
+			//Serial.println("cold if too hot");
 		}
 		else { Serial.println("error"); }
 
 		//print out to the console 
 		Serial.print(thermoOne.readCelsius()); //cold
 		Serial.print(", ");
+		//delay(100);
 		Serial.print(thermoTwo.readCelsius()); //hot
+		Serial.print(", ");
+		Serial.print(cur_diff_hot(hot));
 		Serial.print(", ");
 		Serial.print(cur_diff_cold(cold));
 		Serial.print(", ");
-		Serial.print(cur_diff_hot(hot));
+		Serial.print(hot_maxV); //hot
+		Serial.print(", ");
+		Serial.print(cold_maxV);
 		Serial.print("\n");
 
-		if ((cur_diff_hot(hot) <= 0) && (cur_diff_cold(cold) <= 0)) {
-			return;
-		}
-
-		//}
+		return;
 	}
+
+	if (cur_diff_hot(hot) <= 0) {
+		analogWrite(10, minV);
+		//Serial.println("HOT if too hot");
+	}
+	if (cur_diff_cold(cold) <= 0) {
+		analogWrite(9, minV);
+		//Serial.println("Cold if not hot");
+	}
+
+
+	Serial.println("return");
+	return;
+
 }
 
 
@@ -91,32 +168,10 @@ void setup() {
 	// The MAX31855 needs a little time to stabilize
 
 	delay(500);
-	hot_target = 25;
-	cold_target = 25;
+	//hot_target = 25;
+	//cold_target = 25;
 
-	get_to_target(hot_target, cold_target);
-
-	for (int i; i < 10; i++) {
-		if (cur_diff_cold(cold_target) > 0) {
-			analogWrite(9, maxV);
-		}
-		else if (cur_diff_cold(cold_target) <= 0) {
-			analogWrite(9, minV);
-		}
-		if (cur_diff_hot(hot_target) > 0) {
-			analogWrite(10, maxV);
-		}
-		else if (cur_diff_cold(cold_target) < 0) {
-			analogWrite(10, minV);
-		}
-		Serial.print(thermoOne.readCelsius()); //cold
-		Serial.print(", ");
-		Serial.print(thermoTwo.readCelsius()); //hot
-		Serial.print("\n");
-	}
-	// do the same for over shooting
-	//count++;
-	//if (count > 400) {
+	//get_to_target(hot_target, cold_target);
 
 
 	Serial.println("Start Test 1");
@@ -192,7 +247,7 @@ void loop() {
 
 	}
 	*/
-
+	/*
 	if (test == 3) {
 
 
@@ -247,6 +302,19 @@ void loop() {
 		delay(900);
 
 	}
+
+	*/
+	unsigned char hot = 30;
+	unsigned char cold = 30;
+
+	get_to_target(hot, cold);
+	//Serial.println("looped");
+	Serial.print(thermoOne.readCelsius()); //cold
+	Serial.print(", ");
+	//delay(100);
+	Serial.print(thermoTwo.readCelsius()); //hot
+	Serial.print("\n");
+
 
 
 
