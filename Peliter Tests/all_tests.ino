@@ -119,12 +119,11 @@ void get_to_target(double hot, double cold) {
 		}
 		if (cur_diff_cold(cold) > 0) {
 			cold_maxV = get_maxV(hot, 1);
-			analogWrite(9, 5);
+			analogWrite(9, maxV);
 			//Serial.println("Cold if not hot");
-
 		}
-		else if (cur_diff_cold(hot) <= 0) {
-			//analogWrite(9, minV);
+		else if (cur_diff_cold(cold) <= 0) {
+			analogWrite(9, minV);
 			//Serial.println("cold if too hot");
 		}
 		else { Serial.println("error"); }
@@ -144,7 +143,32 @@ void get_to_target(double hot, double cold) {
 		Serial.print(cold_maxV);
 		Serial.print("\n");
 
-		return;
+
+	}
+
+
+
+	while ((cur_diff_hot(hot) < -1) || (cur_diff_cold(cold) < -1)) {
+		if (cur_diff_hot(hot) > 0) {
+			hot_maxV = get_maxV(hot, 1);
+			analogWrite(10, maxV);
+			//Serial.println("HOT if not hot");
+		}
+		else if (cur_diff_hot(hot) <= 0) {
+			analogWrite(10, minV);
+			//Serial.println("HOT if too hot");
+		}
+		if (cur_diff_cold(cold) > 0) {
+			cold_maxV = get_maxV(hot, 1);
+			analogWrite(9, maxV);
+			//Serial.println("Cold if not hot");
+		}
+		else if (cur_diff_cold(cold) <= 0) {
+			analogWrite(9, minV);
+			//Serial.println("cold if too hot");
+		}
+		else { Serial.println("error"); }
+
 	}
 
 	if (cur_diff_hot(hot) <= 0) {
@@ -155,7 +179,6 @@ void get_to_target(double hot, double cold) {
 		analogWrite(9, minV);
 		//Serial.println("Cold if not hot");
 	}
-
 
 	Serial.println("return");
 	return;
@@ -247,44 +270,23 @@ void loop() {
 
 	}
 	*/
-	/*
-	if (test == 3) {
 
 
-	}
 	unsigned char hot = 50;
-	unsigned char cold = 25;
+	unsigned char cold = 30;
 	get_to_target(hot, cold);
 
-	while ((cur_diff_cold(cold) > 0) || (cur_diff_hot(hot) > 0)) {
-		if (cur_diff_cold(cold) > 0) {
-			analogWrite(9, maxV);
-		}
-		else if (cur_diff_cold(cold) <= 0) {
-			analogWrite(9, minV);
-		}
-		if (cur_diff_hot(hot) > 0) {
-			analogWrite(10, maxV);
-		}
-		else if (cur_diff_cold(cold) < 0) {
-			analogWrite(10, minV);
-		}
-		Serial.print(thermoOne.readCelsius()); //cold
-		Serial.print(", ");
-		Serial.print(thermoTwo.readCelsius()); //hot
-		Serial.print("\n");
-		delay(800);
-	}
+
 
 	Serial.println("start test 3");
-	hot_target = 50;
-	cold_target = 90;
+	hot_target = 80;
+	cold_target = 50;
 	get_to_target(hot_target, cold_target);
 
 
 	Serial.println("Cool Down");
 
-	while (test == 3) {
+	while (1) {
 		analogWrite(9, minV);
 		analogWrite(10, minV);
 
@@ -293,7 +295,7 @@ void loop() {
 		Serial.print(thermoTwo.readCelsius()); //hot
 		Serial.print("\n");
 
-		if ((thermoOne.readCelsius() < 30) && thermoTwo.readCelsius() < 30) {
+		if ((thermoOne.readCelsius() <= 30) && (thermoTwo.readCelsius() <= 30)) {
 			Serial.println("End test 3");
 			break;
 
@@ -303,7 +305,7 @@ void loop() {
 
 	}
 
-	*/
+	/*
 	unsigned char hot = 30;
 	unsigned char cold = 30;
 
@@ -316,7 +318,7 @@ void loop() {
 	Serial.print("\n");
 
 
-
+	*/
 
 
 }
