@@ -20,35 +20,44 @@ Adafruit_MAX31855 thermoOne(maxCLK, maxCS, maxDO);
 Adafruit_MAX31855 thermoTwo(maxCLK2, maxCS2, maxDO2);
 
 int count = 0;
-float arduinoV;
+char minV = 0;
+char maxV = 255;
 
 void setup() {
-    Serial.begin(9600);
-    // The MAX31855 needs a little time to stabilize
-    delay(500);
+	Serial.begin(9600);
+	// The MAX31855 needs a little time to stabilize
+	unsigned char flag = 0;
+	delay(500);
 }
 
 void loop() {
-    delay(2000);
-    Serial.println("Start Test ");
+	//delay(999);
+	Serial.println("Start Test ");
 
-	for (unsigned char V = 0; V < 256; V++) {  //loop that sets Arduino voltage on scale from 0 to 5 V and changes mossfet
-		analogWrite(9, V);     //write the voltage to the first mosfet
-		//analogWrite(10, V);  //write to the second Mosfet
+	analogWrite(10, maxV);  //write to the second Mosfet hot
+	analogWrite(9, minV);     //write the voltage to the first mosfet cold
+	
 
-		Serial.print(thermoOne.readCelsius()); //cold
-		Serial.print(", ");
-		Serial.print(thermoTwo.readCelsius()); //hot
-		Serial.print(", ");
+	Serial.print(thermoOne.readCelsius()); //cold
+	Serial.print(", ");
+	Serial.print(thermoTwo.readCelsius()); //hot
+	Serial.println();
 
-		Serial.print(V);
-		Serial.println();
-		count++;
-
-		delay(5000);           //delay  5 sec 
+	if (thermoOne.readCelsius() > 26) {
+		flag = 1;
 	}
 
+	if ((thermoOne.readCelsius() < 25) && flag) {
+		Serial.println(" END TEST ");
+	}
+	delay(999);
 
-    // delay so it doesn't scroll too fast.
-    delay(1000);
+
+
+
+}
+
+
+// delay so it doesn't scroll too fast.
+//delay(1000);
 }

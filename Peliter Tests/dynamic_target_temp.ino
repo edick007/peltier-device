@@ -14,8 +14,8 @@
 #define maxV 255
 #define minV 0
 
-#define hot_target  75    // target tempuratures set before running
-#define cold_target 50
+#define hot_target  85   // target tempuratures set before running
+#define cold_target 40
 
 #include <Adafruit_MAX31855.h>
 int maxDO = 5;
