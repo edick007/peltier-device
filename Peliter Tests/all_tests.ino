@@ -256,14 +256,16 @@ void loop() {
 		Serial.println();
 
 		if ((thermoOne.readCelsius() >= 90) && (thermoOne.readCelsius() < 90.5)) {
-			flag = 1;
-			Serial.println("Cool Down");
+			if((thermoTwo.readCelcius() >=90) && (thermoTwo.readCelsius() < 90.5){
+				flag = 1;
+				Serial.println("Cool Down");
+			}
 		}
 
 		if ((thermoOne.readCelsius() < 30) && (flag == 1)) {
+			if((thermoTwo.readCelcius() <30){
 			Serial.println(" END TEST 2");
 			test = 3;
-
 		}
 		delay(800);
 
