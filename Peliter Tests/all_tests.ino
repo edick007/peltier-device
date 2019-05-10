@@ -219,7 +219,7 @@ void loop() {
 	//delay(999);
 	unsigned char hot, cold;
 	//test for hot inc and cool down
-	/*
+	
 	while (test == 1) {
 
 		if (flag == 0) {
@@ -272,26 +272,26 @@ void loop() {
 		Serial.println();
 
 		if ((thermoOne.readCelsius() >= 75) && (thermoOne.readCelsius() < 75.5)) {
-			if ((thermoTwo.readCelsius() >= 75)) {
+			//if ((thermoTwo.readCelsius() >= 75)) {
 				flag = 1;
 				Serial.println("Cool Down");
-			}
+			//}
 		}
 
 
 		if ((thermoOne.readCelsius() < 30) && (flag == 1)) {
-			if ((thermoTwo.readCelsius() < 30)) {
+			//if ((thermoTwo.readCelsius() < 30)) {
 				Serial.println(" END TEST 2");
 				test = 3;
 
-			}
+			//}
 			delay(800);
 
 
 		}
 	}
 
-	*/
+	
 
 		 hot = 50;
 		 cold = 30;
